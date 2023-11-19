@@ -37,7 +37,7 @@ local function scan_dir(directory)
   return list
 end
 
-local wallpapers = scan_dir('/Users/eskildht/.config/wezterm/wallpapers')
+local wallpapers = scan_dir('$HOME/.config/wezterm/wallpapers')
 
 config.window_background_image = wallpapers[math.random(1, #wallpapers)]
 config.window_background_image_hsb = {
