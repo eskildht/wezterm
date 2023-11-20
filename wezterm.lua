@@ -38,10 +38,11 @@ local function scan_dir(directory)
 end
 
 local wallpapers = scan_dir('$HOME/.config/wezterm/wallpapers')
+local wallpaper_index = math.random(1, #wallpapers);
 
-config.window_background_image = wallpapers[math.random(1, #wallpapers)]
-config.window_background_image_hsb = {
-  -- Darken the background image by reducing it to 1/3rd
+config.window_background_image = wallpapers[wallpaper_index]
+local default_hsb = {
+  -- Darken the background image by reducing it 
   brightness = 0.2,
   -- You can adjust the hue by scaling its value.
   -- a multiplier of 1.0 leaves the value unchanged.
@@ -49,9 +50,39 @@ config.window_background_image_hsb = {
   -- You can adjust the saturation also.
   saturation = 1.0,
 }
+config.window_background_image_hsb = default_hsb
 
--- pane navigation
+-- brightness decrement
+wezterm.on('brightness-decrement', function(window, _)
+  local overrides = window:get_config_overrides() or {}
+
+  local brightness = overrides.window_background_image_hsb.brightness
+  if (brightness - 0.1) < 0 then
+    overrides.window_background_image_hsb.brightness = 1.0
+  else
+    overrides.window_background_image_hsb.brightness = brightness - 0.1
+  end
+
+  window:set_config_overrides(overrides)
+end)
+
+wezterm.on('wallpaper-next', function(window, _)
+  local overrides = window:get_config_overrides() or {}
+
+  if (wallpaper_index + 1) > #wallpapers then
+    wallpaper_index = 1
+  else
+    wallpaper_index = wallpaper_index + 1
+  end
+
+  overrides.window_background_image = wallpapers[wallpaper_index]
+
+  window:set_config_overrides(overrides)
+end)
+
+-- key mappings
 config.keys = {
+  -- pane navigation
   {
     key = "h",
     mods = "LEADER|CTRL",
@@ -72,6 +103,7 @@ config.keys = {
     mods = "LEADER|CTRL",
     action = act.ActivatePaneDirection("Right"),
   },
+  -- window split
   {
     key = "s",
     mods = "LEADER|CTRL",
@@ -86,12 +118,23 @@ config.keys = {
       domain = "CurrentPaneDomain"
     }),
   },
+  -- close pane
   {
     key = "x",
     mods = "LEADER|CTRL",
     action = act.CloseCurrentPane({
       confirm = false
     }),
+  },
+  {
+    key = 'b',
+    mods = 'SUPER',
+    action = wezterm.action.EmitEvent 'brightness-decrement',
+  },
+  {
+    key = 'l',
+    mods = 'SUPER',
+    action = wezterm.action.EmitEvent 'wallpaper-next',
   },
 }
 
