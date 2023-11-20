@@ -56,6 +56,10 @@ config.window_background_image_hsb = default_hsb
 wezterm.on('brightness-decrement', function(window, _)
   local overrides = window:get_config_overrides() or {}
 
+  if not overrides.window_background_image_hsb then
+    overrides.window_background_image_hsb = default_hsb
+  end
+
   local brightness = overrides.window_background_image_hsb.brightness
   if (brightness - 0.1) < 0 then
     overrides.window_background_image_hsb.brightness = 1.0
