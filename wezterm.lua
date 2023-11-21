@@ -1,6 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require('wezterm')
-local act = wezterm.action
+local action = wezterm.action
 
 -- This table will hold the configuration.
 local config = {}
@@ -90,35 +90,35 @@ config.keys = {
   {
     key = "h",
     mods = "LEADER|CTRL",
-    action = act.ActivatePaneDirection("Left"),
+    action = action.ActivatePaneDirection("Left"),
   },
   {
     key = "j",
     mods = "LEADER|CTRL",
-    action = act.ActivatePaneDirection("Down"),
+    action = action.ActivatePaneDirection("Down"),
   },
   {
     key = "k",
     mods = "LEADER|CTRL",
-    action = act.ActivatePaneDirection("Up"),
+    action = action.ActivatePaneDirection("Up"),
   },
   {
     key = "l",
     mods = "LEADER|CTRL",
-    action = act.ActivatePaneDirection("Right"),
+    action = action.ActivatePaneDirection("Right"),
   },
   -- window split
   {
     key = "s",
     mods = "LEADER|CTRL",
-    action = act.SplitVertical({
+    action = action.SplitVertical({
       domain = "CurrentPaneDomain"
     }),
   },
   {
     key = "v",
     mods = "LEADER|CTRL",
-    action = act.SplitHorizontal({
+    action = action.SplitHorizontal({
       domain = "CurrentPaneDomain"
     }),
   },
@@ -126,19 +126,32 @@ config.keys = {
   {
     key = "x",
     mods = "LEADER|CTRL",
-    action = act.CloseCurrentPane({
+    action = action.CloseCurrentPane({
       confirm = false
     }),
   },
+  -- brightness decrement loop around
   {
     key = 'b',
     mods = 'SUPER',
-    action = wezterm.action.EmitEvent 'brightness-decrement',
+    action = action.EmitEvent('brightness-decrement'),
   },
+  -- next wallpaper
   {
     key = 'l',
     mods = 'SUPER',
-    action = wezterm.action.EmitEvent 'wallpaper-next',
+    action = action.EmitEvent('wallpaper-next'),
+  },
+  -- jump words
+  {
+    key = 'LeftArrow',
+    mods = 'OPT',
+    action = action.SendString('\x1bb'),
+  },
+  {
+    key = 'RightArrow',
+    mods = 'OPT',
+    action = action.SendString('\x1bf'),
   },
 }
 
