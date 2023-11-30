@@ -70,6 +70,24 @@ wezterm.on('brightness-decrement', function(window, _)
   window:set_config_overrides(overrides)
 end)
 
+-- brightness increment
+wezterm.on('brightness-increment', function(window, _)
+  local overrides = window:get_config_overrides() or {}
+
+  if not overrides.window_background_image_hsb then
+    overrides.window_background_image_hsb = default_hsb
+  end
+
+  local brightness = overrides.window_background_image_hsb.brightness
+  if (brightness + 0.1) > 1 then
+    overrides.window_background_image_hsb.brightness = 0
+  else
+    overrides.window_background_image_hsb.brightness = brightness + 0.1
+  end
+
+  window:set_config_overrides(overrides)
+end)
+
 wezterm.on('wallpaper-next', function(window, _)
   local overrides = window:get_config_overrides() or {}
 
@@ -77,6 +95,20 @@ wezterm.on('wallpaper-next', function(window, _)
     wallpaper_index = 1
   else
     wallpaper_index = wallpaper_index + 1
+  end
+
+  overrides.window_background_image = wallpapers[wallpaper_index]
+
+  window:set_config_overrides(overrides)
+end)
+
+wezterm.on('wallpaper-prev', function(window, _)
+  local overrides = window:get_config_overrides() or {}
+
+  if (wallpaper_index - 1) < 1 then
+    wallpaper_index = #wallpapers
+  else
+    wallpaper_index = wallpaper_index - 1
   end
 
   overrides.window_background_image = wallpapers[wallpaper_index]
@@ -132,15 +164,27 @@ config.keys = {
   },
   -- brightness decrement loop around
   {
-    key = 'b',
+    key = 'j',
     mods = 'SUPER',
     action = action.EmitEvent('brightness-decrement'),
+  },
+  -- brightness increment loop around
+  {
+    key = 'k',
+    mods = 'SUPER',
+    action = action.EmitEvent('brightness-increment'),
   },
   -- next wallpaper
   {
     key = 'l',
     mods = 'SUPER',
     action = action.EmitEvent('wallpaper-next'),
+  },
+  -- prev wallpaper
+  {
+    key = 'h',
+    mods = 'SUPER',
+    action = action.EmitEvent('wallpaper-prev'),
   },
   -- jump words
   {
