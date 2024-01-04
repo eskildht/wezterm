@@ -55,6 +55,10 @@ config.window_background_image_hsb = default_hsb
 -- brightness decrement
 wezterm.on('brightness-decrement', function(window, _)
   local overrides = window:get_config_overrides() or {}
+  -- due to the config reloading when using set_config_overrides ensure
+  -- ensure window_background_image does not randomly change if never
+  -- set in overrides
+  overrides.window_background_image = window:effective_config().window_background_image
 
   if not overrides.window_background_image_hsb then
     overrides.window_background_image_hsb = default_hsb
@@ -73,6 +77,10 @@ end)
 -- brightness increment
 wezterm.on('brightness-increment', function(window, _)
   local overrides = window:get_config_overrides() or {}
+  -- due to the config reloading when using set_config_overrides ensure
+  -- ensure window_background_image does not randomly change if never
+  -- set in overrides
+  overrides.window_background_image = window:effective_config().window_background_image
 
   if not overrides.window_background_image_hsb then
     overrides.window_background_image_hsb = default_hsb
