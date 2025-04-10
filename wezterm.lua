@@ -16,9 +16,10 @@ end
 -- For example, changing the color scheme:
 -- config.color_scheme = 'AdventureTime'
 
--- alt handling
-config.send_composed_key_when_left_alt_is_pressed = true
-config.send_composed_key_when_right_alt_is_pressed = true
+-- set powershell as default program
+config.default_prog = { "powershell.exe" }
+-- set font size
+config.font_size = 10.0
 
 -- leader
 config.leader = {
@@ -30,20 +31,24 @@ config.leader = {
 -- background
 local function scan_dir(directory)
   local i, list, popen = 0, {}, io.popen
-  for name in popen([[find "]] ..directory.. [[" -type f]]):lines() do
+  for name in popen('dir "' ..directory.. '" /b'):lines() do
     i = i + 1
     list[i] = name
   end
   return list
 end
 
-local wallpapers = scan_dir('$HOME/.config/wezterm/wallpapers')
-local wallpaper_index = math.random(1, #wallpapers);
+local function get_wallpaper_full_path(wallpaper)
+  return string.format('%s/.config/wezterm/wallpapers/%s', os.getenv('HOME'), wallpaper)
+end
 
-config.window_background_image = wallpapers[wallpaper_index]
+local wallpapers = scan_dir(string.format('%s/.config/wezterm/wallpapers', os.getenv('HOME')))
+local wallpaper_index = math.random(1, #wallpapers)
+
+config.window_background_image = get_wallpaper_full_path(wallpapers[wallpaper_index])
 local default_hsb = {
   -- Darken the background image by reducing it 
-  brightness = 0.2,
+  brightness = 0.1,
   -- You can adjust the hue by scaling its value.
   -- a multiplier of 1.0 leaves the value unchanged.
   hue = 1.0,
@@ -105,7 +110,7 @@ wezterm.on('wallpaper-next', function(window, _)
     wallpaper_index = wallpaper_index + 1
   end
 
-  overrides.window_background_image = wallpapers[wallpaper_index]
+  overrides.window_background_image = get_wallpaper_full_path(wallpapers[wallpaper_index])
 
   window:set_config_overrides(overrides)
 end)
@@ -119,7 +124,7 @@ wezterm.on('wallpaper-prev', function(window, _)
     wallpaper_index = wallpaper_index - 1
   end
 
-  overrides.window_background_image = wallpapers[wallpaper_index]
+  overrides.window_background_image = get_wallpaper_full_path(wallpapers[wallpaper_index])
 
   window:set_config_overrides(overrides)
 end)
@@ -172,38 +177,27 @@ config.keys = {
   },
   -- brightness decrement loop around
   {
-    key = 'j',
-    mods = 'SUPER',
+    key = 'u',
+    mods = 'LEADER|CTRL',
     action = action.EmitEvent('brightness-decrement'),
   },
   -- brightness increment loop around
   {
-    key = 'k',
-    mods = 'SUPER',
+    key = 'i',
+    mods = 'LEADER|CTRL',
     action = action.EmitEvent('brightness-increment'),
   },
   -- next wallpaper
   {
-    key = 'l',
-    mods = 'SUPER',
+    key = 'o',
+    mods = 'LEADER|CTRL',
     action = action.EmitEvent('wallpaper-next'),
   },
   -- prev wallpaper
   {
-    key = 'h',
-    mods = 'SUPER',
+    key = 'y',
+    mods = 'LEADER|CTRL',
     action = action.EmitEvent('wallpaper-prev'),
-  },
-  -- jump words
-  {
-    key = 'LeftArrow',
-    mods = 'OPT',
-    action = action.SendString('\x1bb'),
-  },
-  {
-    key = 'RightArrow',
-    mods = 'OPT',
-    action = action.SendString('\x1bf'),
   },
 }
 
